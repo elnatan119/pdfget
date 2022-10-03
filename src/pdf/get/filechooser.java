@@ -74,6 +74,7 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.opendope.questions.Response;
 
 //needed jars: apache poi and it's dependencies
 //             and additionally: ooxml-schemas-1.4.jar 
@@ -86,17 +87,28 @@ public class filechooser extends JFrame implements ActionListener {
 
     static JLabel l;
     static pdfDoc document;
-    static JCheckBox pages4;
+    static pdfDoc[] documentS;
+    // static JCheckBox pages4;
     // static final PDType1Font TIMES_ROMAN = new PDType1Font(Standard14Fonts.getMappedFontName("TIMES_ITALIC"));
     // a default constructor
-    private static JCheckBox pages8;
+    private static JCheckBox pages;
     static JCheckBox shrinkpdfPIC;
     static JCheckBox shrinkpdfnopic;
     private static JComboBox<ImageType> diagnosisList;
     private static JButton saveButton;
+    private static JCheckBox splitCachck;
+    private static JComboBox<parts> splitList;
+    private static JComboBox<DividingPages> pageList;
     private static JButton openButton;
     private static JButton printButton;
     private static JTextArea myPanel;
+    private static JFrame f;
+    private static JPanel shrinkpanel;
+    private static JPanel spltpanel;
+
+    private static JPanel pagesPanel;
+    private static JPanel chackBokloly;
+    private static JPanel ButtonsPanel;
 
     filechooser() {
     }
@@ -106,8 +118,22 @@ public class filechooser extends JFrame implements ActionListener {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
+        mainFormIns();
+        formOfchackboxAndComboboxIns();
+        formOfButoonsIns();
+        addingtoMainform();
+        Default();
+        showBuotoon(true);
+        megsse(l.getText() + " for new pdf plese enter new pdf");
+    }
+
+    private static void Default() {
+        pages.setSelected(true);
+    }
+
+    public static void mainFormIns() throws HeadlessException {
         // frame to contains GUI elements
-        JFrame f = new JFrame("file chooser");
+        f = new JFrame("file chooser");
 
         // set the size of the frame
         f.setSize(400, 400);
@@ -116,83 +142,90 @@ public class filechooser extends JFrame implements ActionListener {
         f.setVisible(true);
 
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
 
-        JPanel m = new JPanel();
+    public static void addingtoMainform() {
+        f.setLayout(new FlowLayout());
+        f.getContentPane().add(ButtonsPanel);
+        f.getContentPane().add(shrinkpanel);
+        f.getContentPane().add(spltpanel);
+        f.getContentPane().add(pagesPanel);
+        f.getContentPane().add(chackBokloly);
+        f.getContentPane().add(myPanel);
 
-        pages4 = new JCheckBox("4 pages ");
-        pages4.setBounds(100, 100, 50, 50);
-        pages8 = new JCheckBox("8 pages");
-        pages8.setBounds(100, 100, 50, 50);
-        shrinkpdfPIC = new JCheckBox("Reducing the page and changing colors");
-        shrinkpdfPIC.setBounds(100, 100, 50, 50);
-        shrinkpdfnopic = new JCheckBox(" pdf to A4");
-        shrinkpdfnopic.setBounds(100, 100, 50, 50);
-        diagnosisList = new JComboBox<>();
-        diagnosisList.setModel(new DefaultComboBoxModel<>(ImageType.values()));
-        myPanel = new JTextArea("drop in me", 5, 5);
-        Font font = new Font("Verdana", Font.BOLD, 50);
-        myPanel.setFont(font);
-        myPanel.setForeground(Color.BLUE);
-        dropMetue();
-//         model = new DefaultListModel<>();
-//
-//        for (ImageType a : ImageType.values())
-//            model.addElement(a);
-        m.setLayout(new FlowLayout());
-        m.add(pages4);
-        m.add(shrinkpdfPIC);
-        m.add(pages8);
-        m.add(shrinkpdfnopic);
-        m.add(diagnosisList);
+        f.pack();
+        f.setVisible(true);
+    }
 
-        //    m.setSize(400,400);  
-        // m.setVisible(true);
-        // button to open save dialog
+    public static void formOfButoonsIns() {
         saveButton = new JButton("save");
-
-        // button to open open dialog
         openButton = new JButton("open");
         printButton = new JButton("print");
         // make an object of the class filechooser
         filechooser f1 = new filechooser();
-
         // add action listener to the button to capture user
         // response on buttons
         saveButton.addActionListener(f1);
         openButton.addActionListener(f1);
         printButton.addActionListener(f1);
-        makeColoraApper();
+
         // make a panel to add the buttons and labels
-        JPanel p = new JPanel();
+        ButtonsPanel = new JPanel();
 
         // add buttons to the frame
-        p.add(saveButton);
-        p.add(openButton);
-        p.add(printButton);
+        ButtonsPanel.add(saveButton);
+        ButtonsPanel.add(openButton);
+        ButtonsPanel.add(printButton);
         // set the label to its initial value
         l = new JLabel();
 
         // add panel to the frame
-        p.add(l);
-        f.getContentPane().add(p, BorderLayout.SOUTH);
+        ButtonsPanel.add(l);
+    }
 
-        //  f.add(m);
-        f.getContentPane().add(m, BorderLayout.CENTER);
-        f.getContentPane().add(myPanel, BorderLayout.WEST);
+    public static void formOfchackboxAndComboboxIns() throws HeadlessException {
+        chackBokloly = new JPanel();
+        shrinkpdfPIC = new JCheckBox("Reducing the page and changing colors");
+        shrinkpdfPIC.setBounds(100, 100, 50, 50);
+        shrinkpdfnopic = new JCheckBox(" pdf to A4");
+        shrinkpdfnopic.setBounds(100, 100, 50, 50);
+        shrinkpdfPIC = new JCheckBox();
+        diagnosisList = new JComboBox<>();
+        shrinkpanel = panelofcomoandcheckbox(shrinkpdfPIC, diagnosisList, "srink and cange colors", ImageType.values());
+        splitCachck = new JCheckBox();
+        splitList = new JComboBox<>();
+        spltpanel = panelofcomoandcheckbox(splitCachck, splitList, "split docmnet to parts", parts.values());
+        pages = new JCheckBox();
+        pageList = new JComboBox<>();
+        pagesPanel = panelofcomoandcheckbox(pages, pageList, "how much pages you want?", DividingPages.values());
+        myPanel = new JTextArea("drop in me", 5, 5);
+        Font font = new Font("Verdana", Font.BOLD, 50);
+        myPanel.setFont(font);
+        myPanel.setForeground(Color.BLUE);
+        dropMetue();
+        chackBokloly.setLayout(new FlowLayout());
 
-        f.pack();
-        f.setVisible(true);
-        starter();
+        chackBokloly.add(shrinkpdfnopic);
+    }
+
+    public static JPanel panelofcomoandcheckbox(JCheckBox chackbox, JComboBox m, String injChckbox, Object[] getEnume) {
+        JPanel splitpanel = new JPanel();
+        splitpanel.setLayout(new FlowLayout());
+        chackbox.setText(injChckbox);
+        m.setModel(new DefaultComboBoxModel<>(getEnume));
+        m.setVisible(false);
+        makeColoraApper(chackbox, m);
+        splitpanel.add(chackbox);
+        splitpanel.add(m);
+        return splitpanel;
+    }
+
+    public static void chackboxStarting() {
 
     }
 
-    public static void starter() {
-        diagnosisList.setVisible(false);
-        saveButton.setVisible(false);
-        pages8.setSelected(true);
-        megsse("no file selected");
-    }
-
+//
+//    }
     public static void dropMetue() throws HeadlessException {
         myPanel.setDropTarget(new DropTarget() {
             @Override
@@ -201,8 +234,8 @@ public class filechooser extends JFrame implements ActionListener {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for (File file : droppedFiles) {
-                        makeAdoc(file, file.getAbsolutePath());
-                        showBuotoon(false);
+                        doTheWork(file);
+                        
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -211,16 +244,15 @@ public class filechooser extends JFrame implements ActionListener {
         });
     }
 
-    public static void makeColoraApper() {
-        shrinkpdfPIC.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {//checkbox has been selected
-                    diagnosisList.setVisible(true);
+    public static void makeColoraApper(JCheckBox g, JComboBox m) {
+        g.addItemListener((ItemEvent e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {//checkbox has been selected
+                m.setVisible(true);
+                f.pack();
 
-                } else {//checkbox has been deselected
-                    diagnosisList.setVisible(false);
-                }
+            } else {//checkbox has been deselected
+                m.setVisible(false);
+                f.pack();
             }
         });
     }
@@ -231,43 +263,56 @@ public class filechooser extends JFrame implements ActionListener {
         // if the user presses the save button show the save dialog
         String com = evt.getActionCommand();
 
-        if (com.equals("save")) {
-            savaAfile();
-            // eltrntveSaveing();
-            l.setText(l.getText() + " saved");
-            starter();
-            document = null;
-
-        } // if the user presses the open dialog show the open dialog
-        else if (com.equals("open")) {
-            try {
-                openAfile();
-            } catch (Exception ex) {
-                Logger.getLogger(filechooser.class.getName()).log(Level.SEVERE, null, ex);
+        switch (com) {
+            case "save" -> {
+                savaAfile();
+                // eltrntveSaveing();
+                l.setText(l.getText() + " saved");
+                showBuotoon(true);
+                document = null;
             }
-
-            showBuotoon(false);
-
-        } else if (com.equals("print")) {
-            try {
-                document.printfile();
-
-            } catch (PrinterException ex) {
-                Logger.getLogger(filechooser.class.getName()).log(Level.SEVERE, null, ex);
+            case "open" -> {
+                try {
+                    openAfile();
+                } catch (Exception ex) {
+                    Logger.getLogger(filechooser.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                showBuotoon(false);
             }
-            showBuotoon(true);
-            document = new pdfDoc();
+            case "print" -> {
+                try {
+                    document.printfile(getpagesneeds());
+
+                } catch (PrinterException ex) {
+                    Logger.getLogger(filechooser.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                showBuotoon(true);
+                document = new pdfDoc();
+            }
+            default -> {
+            }
         }
+        // if the user presses the open dialog show the open dialog
 
     }
 
     public static void showBuotoon(boolean rest) {
         openButton.setVisible(rest);
         saveButton.setVisible(!rest);
+        printButton.setVisible(!rest);
         myPanel.setVisible(rest);
+        shrinkpdfPIC.setVisible(rest);
+        shrinkpdfnopic.setVisible(rest);
+        // diagnosisList.setVisible(rest);
+        shrinkpanel.setVisible(rest);
+        spltpanel.setVisible(rest);
+
+        pagesPanel.setVisible(rest);
+        f.pack();
+
     }
 
-    public void openAfile() throws HeadlessException, Exception {
+     public void openAfile() throws HeadlessException, Exception {
         // create an object of JFileChooser class
         JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         // resctrict the user to select files of all types
@@ -284,14 +329,27 @@ public class filechooser extends JFrame implements ActionListener {
 
         // if the user selects a file
         if (r == JFileChooser.APPROVE_OPTION) {
+            diagnosisList.setVisible(false);
             megsse("making the doc");
             File file = new File(j.getSelectedFile().getAbsolutePath());
-            makeAdoc(file, file.getAbsolutePath());
+            doTheWork(file);
 
         } // if the user cancelled the operation
         else {
             megsse("the user cancelled the operation");
         }
+    }
+
+    public static  void doTheWork(File file) throws Exception {
+        document = new pdfDoc();
+        if (splitCachck.isSelected())
+        {
+            documentS = pdfDoc.LodeAndMakeADocS(file, file.getAbsolutePath(), getpagesneeds(), l, shrinkpdfnopic.isSelected(), getimgetype(), getsplittype());
+            
+        } else {
+            document.loudAndMakeDoc(file, file.getAbsolutePath(), getpagesneeds(), l, shrinkpdfnopic.isSelected(), getimgetype());
+        }
+        showBuotoon(false);
     }
 
     public void savaAfile() throws HeadlessException {
@@ -317,10 +375,22 @@ public class filechooser extends JFrame implements ActionListener {
         if (r == JFileChooser.APPROVE_OPTION) {
             // set the label to the path of the selected file
 
-            l.setText(makingPDFend(elegidor.getSelectedFile().getAbsolutePath()));
+            l.setText(pdfDoc.makingPDFend(elegidor.getSelectedFile().getAbsolutePath()));
             try {
+                if(documentS!=null)
+                {
+                    for (int i = 0; i < documentS.length; i++) 
+                    {
+                        String name =makingPartEnd(l.getText(),i);
+                        pdfDoc.StraterPage( name, documentS[i], i);
+                        documentS[i].save(new File(name));
+                    }
+                }
+                else
+                {
                 document.save(new File(l.getText()));
                 l.setText(l.getText() + " saved");
+                }
             } catch (IOException ex) {
                 Logger.getLogger(filechooser.class
                         .getName()).log(Level.SEVERE, null, ex);
@@ -338,45 +408,11 @@ public class filechooser extends JFrame implements ActionListener {
         }
     }
 
-    public static void makeAdoc(File file, String getAbsolutePath) throws Exception {
-        // set the label to the path of the selected file
-
-        var doc = new PDDocument();
-        var doc2 = new PDDocument();
-        megsse("loading PDF.....................");
-        if (itispdf(getAbsolutePath)) {
-            document = new pdfDoc();
-            document.lodepdf( file);
-            document.Chackboxtog(pages8, pages4);
-        } else {
-            document.lodepowerpoint(PDRectangle.A4, ImageType.RGB, getAbsolutePath);
-            document.Chackboxtog(pages8, pages4);
-// document = powerpointtopdf(PDRectangle.A4, ImageType.RGB, j.getSelectedFile().getAbsolutePath());
-        }
-
-        if (shrinkpdfPIC.isSelected()) {
-            megsse("Reducing pdf ");
-            document.ShrinkPDF(PDRectangle.A4, (ImageType) (diagnosisList.getSelectedItem()));
-        }
-        megsse("adding page numbers..............");
-        document.addPageNumbers(" {0}", 60, 18, 20, 1, true);
-        System.out.println("document =" + document);
-        if (pages4.isSelected() || pages8.isSelected()) {
-
-            document.bookops(doc2,l);
-        } else {
-            document.regluerOpsinOFmulti(doc2, doc);
-        }
-
-        megsse(
-                "Finish Please save the document");
-
-    }
-
     public static void megsse(String g) {
 
         l.setText(g);
         l.paintImmediately(l.getVisibleRect());
+        f.pack();
     }
 
     // בהתחלה לבדוק אם זוגי או לא זוגי.
@@ -385,15 +421,32 @@ public class filechooser extends JFrame implements ActionListener {
     // לבדוק אם מתחלק ב4 
     // אם לא להוסיף  עוד 2  דפים
     // להדפיס. 
-    private String makingPDFend(String absolutePath) {
-        if (!itispdf(absolutePath)) {
-            return absolutePath + ".pdf";
+    private static DividingPages getpagesneeds() {
+        return (DividingPages) pageList.getSelectedItem();
+    }
+
+    private static ImageType getimgetype() {
+        return (ImageType) diagnosisList.getSelectedItem();
+    }
+
+    private static int getsplittype() {
+        parts p = (parts) splitList.getSelectedItem();
+
+        if (p == parts.four) {
+            return 4;
         }
-        return absolutePath;
+        if (p == parts.three) {
+            return 3;
+        }
+        if (p == parts.two) {
+            return 2;
+        }
+        return -1;
     }
 
-    public static boolean itispdf(String absolutePath) {
-        return absolutePath.substring(absolutePath.length() - 5).contains(".pdf");
+    private String makingPartEnd(String text,int part) 
+    {
+        part++;
+       return text.substring(0,text.indexOf('.'))+" part " +part +text.substring(text.indexOf('.'),text.length());
     }
-
 }
