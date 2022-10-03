@@ -36,7 +36,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
@@ -47,58 +46,29 @@ import org.apache.pdfbox.printing.PDFPrintable;
 import org.apache.pdfbox.printing.Scaling;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import static org.apache.poi.hssf.usermodel.HeaderFooter.file;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
+import static pdf.get.filechooser.document;
+
+
 
 /**
  *
  * @author User
  */
-enum DividingPages {
+enum pages {
     Eight,
     Four,
     Oldway
 }
 
-enum parts {
-    four,
-    three,
-    two
-}
 
 public class pdfDoc extends PDDocument {
 
-//    private static String hebREP(String subSequence) 
-//    {
-//      if(isitHeb(subSequence))
-//      {
-//          String replce="";
-//          for (int i = subSequence.length(); i >=0 ; i--) 
-//          {
-//              replce= replce +subSequence.charAt(i);
-//             
-//          }
-//          return replce;
-//      }
-//      return subSequence;
-//    }
-//
-//    private static boolean isitHeb(String subSequence) 
-//    {
-//        for (int i = 0; i <subSequence.length() ; i++) 
-//        {
-//          char a =  subSequence.charAt(i);
-//           if('א'<= a||a>='ת')
-//           {
-//               return  true;
-//           }
-//        }
-//        return false;
-//    }
-
-    boolean srinknopic = false;
+    private pages g;
+    boolean srinknopic =false;
     PDDocument document = this;
-
     public boolean isSrinknopic() {
         return srinknopic;
     }
@@ -106,17 +76,28 @@ public class pdfDoc extends PDDocument {
     public void setSrinknopic(boolean srinknopic) {
         this.srinknopic = srinknopic;
     }
+    public pages getG() {
+        return g;
+    }
+
+   
 
     /**
      *
-     * // * @param g-איזה סוג דף זה
+   //  * @param g-איזה סוג דף זה
      */
-    
-
-    public void lodepdf(File file) throws IOException {
-        document = Loader.loadPDF(file);
+    public pdfDoc() 
+    {
+        super();
+      
 
     }
+      public void lodepdf( File file) throws IOException {
+           document =  Loader.loadPDF(file);
+           
+      }
+
+    
 
     public void addPageNumbers(String numberingFormat, int offset_X, int offset_Y, int size, int page_counter, boolean makeZEFR) throws IOException {
 
@@ -156,18 +137,18 @@ public class pdfDoc extends PDDocument {
         }
     }
 
-    public void generateSideBySidePDF(PDRectangle PDRhrinkpdfnopic, DividingPages g) {
+    public void generateSideBySidePDF(PDRectangle PDRhrinkpdfnopic) {
         PDDocument pdf1 = document;
         var outPdf2 = new PDDocument();
         PDDocument outPdf;
-        megsse(pdf1.getNumberOfPages() + "", filechooser.l);
+        megsse( pdf1.getNumberOfPages()+"", filechooser.l);  
         try {
 
             int pdfconter = 0;
             int key = 1;
             int shy = 1;
             int number = 0;
-
+           
             // Create output PDF frame
             while (pdfconter + 1 < pdf1.getNumberOfPages()) {
                 outPdf = new PDDocument();
@@ -189,7 +170,7 @@ public class pdfDoc extends PDDocument {
 
                 outPdf.addPage(outPdfPage);
 
-                // Source PDF DividingPages has to be imported as form XObjects to be able to insert them at a specific point in the output page
+                // Source PDF pages has to be imported as form XObjects to be able to insert them at a specific point in the output page
                 LayerUtility layerUtility = new LayerUtility(outPdf);
                 PDFormXObject formPdf1 = layerUtility.importPageAsForm(pdf1, pdfconter + key);
                 PDFormXObject formPdf2 = layerUtility.importPageAsForm(pdf1, pdfconter + number);
@@ -203,7 +184,7 @@ public class pdfDoc extends PDDocument {
                 pdfconter += 2;
                 outPdf2.addPage(outPdf.getPage(0));
 
-                if ((g == DividingPages.Four)) {
+                if ((pages4isSelected())) {
                     if (key == 1) {
                         key = 0;
                         number = 1;
@@ -211,7 +192,7 @@ public class pdfDoc extends PDDocument {
                         key = 1;
                         number = 0;
                     }
-                } else if (shy % 2 == 0 && g == DividingPages.Eight) {
+                } else if (shy % 2 == 0 && pages8isSelected()) {
                     if (key == 1) {
                         key = 0;
                         number = 1;
@@ -264,7 +245,7 @@ public class pdfDoc extends PDDocument {
                 dict.setItem(COSName.ART_BOX, outPdfFrame);
                 PDPage outPdfPage = new PDPage(dict);
                 outPdf.addPage(outPdfPage);
-                // Source PDF DividingPages has to be imported as form XObjects to be able to insert them at a specific point in the output page
+                // Source PDF pages has to be imported as form XObjects to be able to insert them at a specific point in the output page
                 LayerUtility layerUtility = new LayerUtility(outPdf);
                 PDFormXObject formPdf1 = layerUtility.importPageAsForm(pdf1, pdfconter);
                 PDFormXObject formPdf2 = layerUtility.importPageAsForm(pdf1, pdfconter + 1);
@@ -302,9 +283,6 @@ public class pdfDoc extends PDDocument {
         int replece = 0;
         int key = 0;
         int sharit = 8 - (document.getNumberOfPages() % 8);
-        if (sharit == 8) {
-            sharit = 0;
-        }
         int end = document.getNumberOfPages() - 1 + sharit;
         int a[] = new int[end + 1];
         PDDocument AD = new PDDocument();
@@ -401,7 +379,7 @@ public class pdfDoc extends PDDocument {
     }
 
     public void ShrinkPDF(PDRectangle K, ImageType m) {
-        PDDocument oDocument = document;
+        PDDocument oDocument = this;
         PDDocument pdDocument = new PDDocument();
         try {
 
@@ -463,19 +441,23 @@ public class pdfDoc extends PDDocument {
         document = pdDocument;
     }
 
-    public void printfile(DividingPages g) throws PrinterException {
+    private boolean pages8isSelected() {
+        return g == pages.Eight;
+    }
+
+    public void printfile() throws PrinterException {
 
         PrinterJob job = PrinterJob.getPrinterJob();
-        job.setPrintService(choosePrinter(g));
+        job.setPrintService(choosePrinter());
 
         job.setPageable(new PDFPageable(document));
         job.print();
     }
 
-    public PrintService choosePrinter(DividingPages g) {
+    public  PrintService choosePrinter() {
         PrinterJob printJob = PrinterJob.getPrinterJob();
         PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-        hagdrodHadpsa(attributes, g);
+        hagdrodHadpsa(attributes);
 
         if (printJob.printDialog(attributes)) {
             return printJob.getPrintService();
@@ -484,9 +466,10 @@ public class pdfDoc extends PDDocument {
         }
     }
 
-    public void hagdrodHadpsa(PrintRequestAttributeSet attributes, DividingPages g) {
+    public  void hagdrodHadpsa(PrintRequestAttributeSet attributes) {
         //  attributes.add(MediaSizeName.);
-        if (g == DividingPages.Four) {
+        if (pages4isSelected()) 
+        {
             attributes.add(Sides.TWO_SIDED_SHORT_EDGE);
         } else {
             attributes.add(Sides.TWO_SIDED_LONG_EDGE);
@@ -499,7 +482,7 @@ public class pdfDoc extends PDDocument {
 //         attributes.add((Attribute) saveButton);
     }
 
-    private void eltrntveSaveing() throws PrinterException {
+    private void eltrntveSaveing( ) throws PrinterException {
 
         String printerNameDesired = "Microsoft Print to PDF";
 
@@ -528,27 +511,27 @@ public class pdfDoc extends PDDocument {
 
     }
 
-    public void bookops(PDDocument doc2, JLabel l, DividingPages g) throws IOException {
+    public void bookops(PDDocument doc2,JLabel l) throws IOException {
         PDPage p = new PDPage();
         System.out.println("document=" + document.getNumberOfPages());
 
         // function reArange()
-        // function add DividingPages if needed 
+        // function add pages if needed 
         // function devideTo4()
 //        for (int i = 0; i < (document.getNumberOfPages() % 2); i++) {
 //
 //            document.addPage(p);
 //        }
         System.out.println("document  adding  A=" + document.getNumberOfPages());
-        if (g == DividingPages.Eight) {
-            megsse("Prepares  eight pages ", l);
+        if (pages8isSelected()) {
+            megsse("Prepares  eight pages ",l);
             book8pages();
 
         }
-        if (g == DividingPages.Four) {
+        if (pages4isSelected()) {
             book4pages();
 
-            megsse("Prepares four pages", l);
+            megsse("Prepares four pages",l);
         }
         p = new PDPage();
 //          for (int i = 0; i < (document.getNumberOfPages() % 2); i++) 
@@ -557,11 +540,11 @@ public class pdfDoc extends PDDocument {
 //            document.addPage(p);
 //        }
         System.out.println("document after adding  A=" + document.getNumberOfPages());
-        generateSideBySidePDF(PDRectangle.A4, g);
+        generateSideBySidePDF(PDRectangle.A4);
         System.out.println("document before adding b=" + document.getNumberOfPages());
 
         System.out.println("document after adding b=" + document.getNumberOfPages());
-        if (g == DividingPages.Eight) {
+        if (pages8isSelected()) {
             generate4BySidePDF(PDRectangle.A4);
         }
         System.out.println("document end =" + document.getNumberOfPages());
@@ -569,13 +552,17 @@ public class pdfDoc extends PDDocument {
 
     }
 
-    public void regluerOpsinOFmulti(PDDocument doc2, PDDocument doc, DividingPages g) throws IOException {
+    private boolean pages4isSelected() {
+        return g == pages.Four;
+    }
+
+    public void regluerOpsinOFmulti(PDDocument doc2, PDDocument doc) throws IOException {
         for (int i = 0; i < document.getNumberOfPages() % 2; i++) {
             doc2.addPage(document.getPage(((document.getNumberOfPages() / 2) * 2) + i));
 
         }
         System.out.println("doc2=" + doc2.getNumberOfPages());
-        generateSideBySidePDF(PDRectangle.A4, g);
+        generateSideBySidePDF(PDRectangle.A4);
         for (int i = 0; i < document.getNumberOfPages() % 2; i++) {
             doc.addPage(document.getPage(((document.getNumberOfPages() / 2) * 2) + i));
 
@@ -593,124 +580,27 @@ public class pdfDoc extends PDDocument {
         addPageNumbers(" {0}", 60, 18, 40, 1, false);
     }
 
-    public void megsse(String g, JLabel l) {
+    void Chackboxtog(JCheckBox pages8, JCheckBox pages4) {
+        if (pages4.isSelected()) {
+            g = pages.Four;
+        } else if (pages8.isSelected()) {
+            g = pages.Eight;
+        } else {
+            g = pages.Oldway;
+        }
+    }
+    public  void megsse(String g, JLabel l) 
+    {
 
         l.setText(g);
         l.paintImmediately(l.getVisibleRect());
     }
-
     @Override
-    public void save(File file) throws IOException {
-        document.save(file);
-    }
-
-    public void loudAndMakeDoc(File file, String getAbsolutePath, DividingPages g, JLabel l, boolean shrinkpdfPIC, ImageType diagnosisListgetSelectedItem) throws Exception {
-        // set the label to the path of the selected file
-
-        megsse("loading PDF.....................", l);
-        if (itispdf(getAbsolutePath)) {
-
-            lodepdf(file);
-            //  document.Chackboxtog(pages8, pages4);
-        } else {
-            lodepowerpoint(PDRectangle.A4, ImageType.RGB, getAbsolutePath);
-            // document.Chackboxtog(pages8, pages4);
-// document = powerpointtopdf(PDRectangle.A4, ImageType.RGB, j.getSelectedFile().getAbsolutePath());
-        }
-
-        MakeADoc(shrinkpdfPIC, l, diagnosisListgetSelectedItem, g);
-
-    }
-
-    public void MakeADoc(boolean shrinkpdfPIC, JLabel l, ImageType diagnosisListgetSelectedItem, DividingPages g) throws IOException {
-        var doc = new PDDocument();
-        var doc2 = new PDDocument();
-        if (shrinkpdfPIC) {
-            megsse("Reducing pdf ", l);
-            ShrinkPDF(PDRectangle.A4, (diagnosisListgetSelectedItem));
-        }
-        megsse("adding page numbers..............", l);
-        addPageNumbers(" {0}", 60, 18, 20, 1, true);
-        System.out.println("document =" + document);
-        if (g == DividingPages.Eight || g == DividingPages.Four) {
-
-            bookops(doc2, l, g);
-        } else if (g == DividingPages.Oldway) {
-            regluerOpsinOFmulti(doc2, doc, g);
-        }
-
-        megsse(
-                "Finish Please save or print  the document", l);
-    }
-
-    public static boolean itispdf(String absolutePath) {
-        return absolutePath.substring(absolutePath.length() - 5).contains(".pdf");
-    }
-
-    public static String makingPDFend(String absolutePath) {
-        if (!itispdf(absolutePath)) {
-            return absolutePath + ".pdf";
-        }
-        return absolutePath;
-    }
-
-        public static   pdfDoc[] LodeAndMakeADocS(  File file, String absolutePath, DividingPages pagesneeds, JLabel l, boolean shrinkpdfnopicBool, ImageType imgetype, int splittype) throws IOException, Exception 
-        {
-        pdfDoc[] doc = new pdfDoc[splittype];
-        PDDocument document = Loader.loadPDF(file);
-        int howMuchleft = document.getNumberOfPages();
-        int TOgo = document.getNumberOfPages() / splittype;
-        int part = document.getNumberOfPages() / splittype;
-        int hdkdmot = 0;
-        for (int i = 0; i < splittype; i++) {
-            pdfDoc pdffoc = new pdfDoc();
-            pdffoc.addPage(new PDPage());
-         //   addingStraterPage(file.getName(), pdffoc, i);
-          pdfDoc.addPages(hdkdmot, TOgo, document, pdffoc);
-            hdkdmot = TOgo;
-            if (i+2==splittype) 
-            {
-                TOgo = document.getNumberOfPages();
-
-            } else {
-                TOgo = TOgo + part;
-            }
-            pdffoc.MakeADoc(shrinkpdfnopicBool, l, imgetype, pagesneeds);
-            doc[i] = pdffoc;
-
-        }
-        return doc;
-    }
-
-    public static void StraterPage( String name, pdfDoc pdffoc, int i) throws IOException {
-        PDFont font = PDType0Font.load(pdffoc, new File("C:/windows/fonts/david.ttf"));
-        try (PDPageContentStream contentStream = new PDPageContentStream(pdffoc, pdffoc.getPage(0), PDPageContentStream.AppendMode.APPEND, true, true)) {
-            contentStream.setFont(font, 50);
-            contentStream.beginText();
-            
-            PDRectangle pageSize = pdffoc.getPage(0).getMediaBox();
-            float x = pageSize.getLowerLeftX();
-            float y = pageSize.getLowerLeftY();
-           // contentStream.newLineAtOffset(x + (pageSize.getWidth() / 2), y + (pageSize.getHeight() / 2));
-               contentStream.newLineAtOffset(0,400);
-               i++;
-            String text =  ((String) name.subSequence(0, name.indexOf("."))) + "  part  " + i;
-            
-            contentStream.showText(text);
-            contentStream.endText();
-              contentStream.close(); // don't forget that one!
-
-        }
-
-    }
+     public  void save(File file) throws IOException
+     {
+         document.save(file);
+     }
 
     
 
-    private static void addPages(int hdkdmot, int TOgo, PDDocument documentMain,PDDocument docpdf) 
-    {
-        for (int i = hdkdmot; i < TOgo; i++) 
-        {
-           docpdf.addPage(documentMain.getPage(i));
-        }
-    }
 }
