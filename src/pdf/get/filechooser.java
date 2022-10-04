@@ -101,7 +101,7 @@ public class filechooser extends JFrame implements ActionListener {
     private static JComboBox<DividingPages> pageList;
     private static JButton openButton;
     private static JButton printButton;
-    private static JTextArea myPanel;
+    private static JTextArea TextPanel;
     private static JFrame f;
     private static JPanel shrinkpanel;
     private static JPanel spltpanel;
@@ -151,7 +151,7 @@ public class filechooser extends JFrame implements ActionListener {
         f.getContentPane().add(spltpanel);
         f.getContentPane().add(pagesPanel);
         f.getContentPane().add(chackBokloly);
-        f.getContentPane().add(myPanel);
+        f.getContentPane().add(TextPanel);
 
         f.pack();
         f.setVisible(true);
@@ -198,10 +198,10 @@ public class filechooser extends JFrame implements ActionListener {
         pages = new JCheckBox();
         pageList = new JComboBox<>();
         pagesPanel = panelofcomoandcheckbox(pages, pageList, "how much pages you want?", DividingPages.values());
-        myPanel = new JTextArea("drop in me", 5, 5);
+        TextPanel = new JTextArea("drop in me", 5, 5);
         Font font = new Font("Verdana", Font.BOLD, 50);
-        myPanel.setFont(font);
-        myPanel.setForeground(Color.BLUE);
+        TextPanel.setFont(font);
+        TextPanel.setForeground(Color.BLUE);
         dropMetue();
         chackBokloly.setLayout(new FlowLayout());
 
@@ -220,14 +220,15 @@ public class filechooser extends JFrame implements ActionListener {
         return splitpanel;
     }
 
-    public static void chackboxStarting() {
+    public static void chackboxStarting() 
+    {
 
     }
 
 //
 //    }
     public static void dropMetue() throws HeadlessException {
-        myPanel.setDropTarget(new DropTarget() {
+        TextPanel.setDropTarget(new DropTarget() {
             @Override
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
@@ -300,7 +301,7 @@ public class filechooser extends JFrame implements ActionListener {
         openButton.setVisible(rest);
         saveButton.setVisible(!rest);
         printButton.setVisible(!rest);
-        myPanel.setVisible(rest);
+        TextPanel.setVisible(rest);
         shrinkpdfPIC.setVisible(rest);
         shrinkpdfnopic.setVisible(rest);
         // diagnosisList.setVisible(rest);
