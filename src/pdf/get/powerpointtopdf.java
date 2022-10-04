@@ -4,11 +4,3 @@
  * and open the template in the editor.
  */
 package pdf.get;
-
-/**
- *
- * @author User
- */
-public class powerpointtopdf {
-    
-}
