@@ -28,7 +28,10 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
+import org.apache.commons.compress.utils.Lists;
 //import org.apache.log4j.BasicConfigurator;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -87,7 +91,8 @@ public class filechooser extends JFrame implements ActionListener {
 
     static JLabel l;
     static pdfDoc document;
-    static pdfDoc[] documentS;
+    static ArrayList<pdfDoc> documentS;
+    static ArrayList<File> FilesS= new ArrayList<File>();
     // static JCheckBox pages4;
     // static final PDType1Font TIMES_ROMAN = new PDType1Font(Standard14Fonts.getMappedFontName("TIMES_ITALIC"));
     // a default constructor
@@ -96,11 +101,12 @@ public class filechooser extends JFrame implements ActionListener {
     static JCheckBox shrinkpdfnopic;
     private static JComboBox<ImageType> diagnosisList;
     private static JButton saveButton;
-    private static JCheckBox splitCachck;
-    private static JComboBox<parts> splitList;
+    private static JCheckBox partCachck;
+    private static JComboBox<Parts> partsList;
     private static JComboBox<DividingPages> pageList;
     private static JButton openButton;
     private static JButton printButton;
+    private static JButton WorkButton;
     private static JTextArea TextPanel;
     private static JFrame f;
     private static JPanel shrinkpanel;
@@ -109,7 +115,7 @@ public class filechooser extends JFrame implements ActionListener {
     private static JPanel pagesPanel;
     private static JPanel chackBokloly;
     private static JPanel ButtonsPanel;
-
+     private static String  maxSparte="----------------------";
     filechooser() {
     }
 
@@ -161,6 +167,7 @@ public class filechooser extends JFrame implements ActionListener {
         saveButton = new JButton("save");
         openButton = new JButton("open");
         printButton = new JButton("print");
+        WorkButton = new JButton("strat Work");
         // make an object of the class filechooser
         filechooser f1 = new filechooser();
         // add action listener to the button to capture user
@@ -168,7 +175,7 @@ public class filechooser extends JFrame implements ActionListener {
         saveButton.addActionListener(f1);
         openButton.addActionListener(f1);
         printButton.addActionListener(f1);
-
+        WorkButton.addActionListener(f1);
         // make a panel to add the buttons and labels
         ButtonsPanel = new JPanel();
 
@@ -176,6 +183,8 @@ public class filechooser extends JFrame implements ActionListener {
         ButtonsPanel.add(saveButton);
         ButtonsPanel.add(openButton);
         ButtonsPanel.add(printButton);
+        ButtonsPanel.add(WorkButton);
+
         // set the label to its initial value
         l = new JLabel();
 
@@ -192,14 +201,15 @@ public class filechooser extends JFrame implements ActionListener {
         shrinkpdfPIC = new JCheckBox();
         diagnosisList = new JComboBox<>();
         shrinkpanel = panelofcomoandcheckbox(shrinkpdfPIC, diagnosisList, "srink and cange colors", ImageType.values());
-        splitCachck = new JCheckBox();
-        splitList = new JComboBox<>();
-        spltpanel = panelofcomoandcheckbox(splitCachck, splitList, "split docmnet to parts", parts.values());
+        partCachck = new JCheckBox();
+        partsList = new JComboBox<>();
+        spltpanel = panelofcomoandcheckbox(partCachck, partsList, "split docmnet to parts", Parts.values());
         pages = new JCheckBox();
         pageList = new JComboBox<>();
         pagesPanel = panelofcomoandcheckbox(pages, pageList, "how much pages you want?", DividingPages.values());
         TextPanel = new JTextArea("drop in me", 5, 5);
-        Font font = new Font("Verdana", Font.BOLD, 50);
+        
+        Font font = new Font("C:/windows/fonts/david.ttf", Font.PLAIN, 20);
         TextPanel.setFont(font);
         TextPanel.setForeground(Color.BLUE);
         dropMetue();
@@ -220,8 +230,7 @@ public class filechooser extends JFrame implements ActionListener {
         return splitpanel;
     }
 
-    public static void chackboxStarting() 
-    {
+    public static void chackboxStarting() {
 
     }
 
@@ -234,16 +243,69 @@ public class filechooser extends JFrame implements ActionListener {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List<File> droppedFiles = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    for (File file : droppedFiles) {
-                        doTheWork(file);
+                 
+                   ArrayList<File> droppedFilesS = new ArrayList<>(droppedFiles); 
+ 
+                   
+                        PutTheNameAndInThelist(droppedFilesS);
                         
-                    }
+                        showTheButoonOfDoWork();
+                        
+
+                    
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
+
+        
         });
+        TextPanel.setEditable(false);
     }
+        private  static  void PutTheNameAndInThelist(ArrayList<File> droppedFiles) 
+            {
+                 for (File file : droppedFiles) 
+                 {
+                    String closer="|";
+                String sprate ="\n" + MakSparte(closer+file.getAbsolutePath()+closer)+"\n";
+               
+               FilesS.add(file);
+               TextPanel.setText(TextPanel.getText()+sprate+closer+file.getAbsolutePath()+closer+sprate);
+                }
+                 if(FilesS.size()>1)
+                 {
+                      partCachck.setSelected(true);
+                     partCachck.setText("how much pdf? you want in the output ");
+                     partCachck.setEnabled(false);
+                 }
+                //ArrayList<String>
+                 
+            }
+
+            private static  void showTheButoonOfDoWork() 
+            {
+               WorkButton.setVisible(true);
+               f.pack();
+            }
+
+            private static String MakSparte(String absolutePath) 
+            {
+                if(maxSparte.length()<absolutePath.length())
+                {
+                   
+                    
+                    String k ="";
+                    maxSparte="";
+                    for (int i = 0; i <absolutePath.length()+10 ; i++) 
+                    {
+                    k+="-";    
+                    }
+                  
+                 
+                  return k;
+                }
+                return absolutePath;
+            }
 
     public static void makeColoraApper(JCheckBox g, JComboBox m) {
         g.addItemListener((ItemEvent e) -> {
@@ -290,6 +352,13 @@ public class filechooser extends JFrame implements ActionListener {
                 showBuotoon(true);
                 document = new pdfDoc();
             }
+            case "strat Work" -> {
+            try {
+               doTheWork();
+            } catch (Exception ex) {
+                Logger.getLogger(filechooser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            }
             default -> {
             }
         }
@@ -309,11 +378,12 @@ public class filechooser extends JFrame implements ActionListener {
         spltpanel.setVisible(rest);
 
         pagesPanel.setVisible(rest);
+        WorkButton.setVisible(false);
         f.pack();
 
     }
 
-     public void openAfile() throws HeadlessException, Exception {
+    public void openAfile() throws HeadlessException, Exception {
         // create an object of JFileChooser class
         JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         // resctrict the user to select files of all types
@@ -330,10 +400,10 @@ public class filechooser extends JFrame implements ActionListener {
 
         // if the user selects a file
         if (r == JFileChooser.APPROVE_OPTION) {
-            diagnosisList.setVisible(false);
-            megsse("making the doc");
-            File file = new File(j.getSelectedFile().getAbsolutePath());
-            doTheWork(file);
+            File[] k =j.getSelectedFiles();
+            ArrayList<File> mkm=  new ArrayList<>(Arrays.asList(k));     
+            PutTheNameAndInThelist(mkm);
+                        showTheButoonOfDoWork();
 
         } // if the user cancelled the operation
         else {
@@ -341,18 +411,62 @@ public class filechooser extends JFrame implements ActionListener {
         }
     }
 
-    public static  void doTheWork(File file) throws Exception {
+    public static void doTheWork() throws Exception {
         document = new pdfDoc();
-        if (splitCachck.isSelected())
-        {
-            documentS = pdfDoc.LodeAndMakeADocS(file, file.getAbsolutePath(), getpagesneeds(), l, shrinkpdfnopic.isSelected(), getimgetype(), getsplittype());
+        if (FilesS.size()>1) {
+            switch (getsplittype()) 
+           {
+                case one:
+                    ArrayOfPdfDocs.lodeFilesindoc(FilesS,document, getpagesneeds(), l, shrinkpdfPIC.isSelected(), getimgetype());
+                    document.MakeADoc(shrinkpdfPIC.isSelected(), l, getimgetype(), getpagesneeds());
+                    break;
+                default:
             
+            documentS = LodeAndMakeADocS(FilesS, getpagesneeds(), l, true, getimgetype(),getsplittype() );
+            }
         } else {
-            document.loudAndMakeDoc(file, file.getAbsolutePath(), getpagesneeds(), l, shrinkpdfnopic.isSelected(), getimgetype());
+            document.loudAndMakeDoc(FilesS.get(0), FilesS.get(0).getAbsolutePath(), getpagesneeds(), l, shrinkpdfnopic.isSelected(), getimgetype());
         }
         showBuotoon(false);
     }
-
+     static ArrayList<pdfDoc> LodeAndMakeADocS(ArrayList<File> FilesS, DividingPages pagesneeds, JLabel l, boolean selected, ImageType imgetype, Parts part) throws Exception {
+        ArrayList<pdfDoc> doc = new ArrayList<pdfDoc>();
+        
+            
+            
+          
+           switch (part) 
+           {
+                case orginal:
+                    for (var file : FilesS) 
+                    {
+                          pdfDoc a = new pdfDoc();
+               a.loudAndMakeDoc(file,file.getAbsolutePath(), pagesneeds, l, selected, imgetype);
+                    doc.add(a);
+                    }
+                    break;
+                case one:
+                    ArrayOfPdfDocs.lodeFilesindoc(FilesS,document, pagesneeds, l, selected, imgetype);
+                    document.MakeADoc(shrinkpdfPIC.isSelected(), l, imgetype, pagesneeds);
+                    break;
+                default:
+                   return lodeFilesAndSplitThem(FilesS, Parts.getsplittype(part), selected, l, imgetype, pagesneeds, doc);
+                  
+                   
+            
+           
+           
+          
+        }
+        return doc;
+    }
+      static ArrayList<pdfDoc> lodeFilesAndSplitThem(ArrayList<File> FilesS, int splittype, boolean selected, JLabel l, ImageType imgetype, DividingPages pagesneeds, ArrayList<pdfDoc> doc) throws Exception 
+    {
+        
+      ArrayOfPdfDocs.lodeFilesindoc(FilesS,document, pagesneeds, l, selected, imgetype);
+       documentS= ArrayOfPdfDocs.splitAndMakeDOC(document, splittype, selected, l, imgetype, pagesneeds, doc);
+        return  doc;
+    }
     public void savaAfile() throws HeadlessException {
         // create an object of JFileChooser class
         JFileChooser elegidor = new JFileChooser();
@@ -378,19 +492,15 @@ public class filechooser extends JFrame implements ActionListener {
 
             l.setText(pdfDoc.makingPDFend(elegidor.getSelectedFile().getAbsolutePath()));
             try {
-                if(documentS!=null)
-                {
-                    for (int i = 0; i < documentS.length; i++) 
-                    {
-                        String name =makingPartEnd(l.getText(),i);
-                        pdfDoc.StraterPage( name, documentS[i], i);
-                        documentS[i].save(new File(name));
+                if (documentS != null) {
+                    for (int i = 0; i < documentS.size(); i++) {
+                        String name = makingPartEnd(l.getText(), i);
+                        pdfDoc.StraterPage(name, documentS.get(i), i);
+                        documentS.get(i).save(new File(name));
                     }
-                }
-                else
-                {
-                document.save(new File(l.getText()));
-                l.setText(l.getText() + " saved");
+                } else {
+                    document.save(new File(l.getText()));
+                    l.setText(l.getText() + " saved");
                 }
             } catch (IOException ex) {
                 Logger.getLogger(filechooser.class
@@ -430,24 +540,19 @@ public class filechooser extends JFrame implements ActionListener {
         return (ImageType) diagnosisList.getSelectedItem();
     }
 
-    private static int getsplittype() {
-        parts p = (parts) splitList.getSelectedItem();
+   
 
-        if (p == parts.four) {
-            return 4;
-        }
-        if (p == parts.three) {
-            return 3;
-        }
-        if (p == parts.two) {
-            return 2;
-        }
-        return -1;
-    }
-
-    private String makingPartEnd(String text,int part) 
-    {
+    private String makingPartEnd(String text, int part) {
         part++;
-       return text.substring(0,text.indexOf('.'))+" part " +part +text.substring(text.indexOf('.'),text.length());
+        return text.substring(0, text.indexOf('.')) + " part " + part + text.substring(text.indexOf('.'), text.length());
     }
+
+    private File getFormTextArea() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    private static Parts getsplittype() 
+    {
+        return (Parts) partsList.getSelectedItem();
+    }
+    
 }

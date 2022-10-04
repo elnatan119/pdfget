@@ -34,6 +34,7 @@ import org.apache.pdfbox.multipdf.LayerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
@@ -60,12 +61,31 @@ enum DividingPages {
     Oldway
 }
 
-enum parts {
+enum Parts {
     four,
     three,
-    two
-}
+    two,orginal,one;
 
+    static int getsplittype(Parts part) 
+    {
+        if(null!=part)
+        switch (part) {
+            case one:
+                return 1;
+            case two:
+                return 2;
+            case three:
+                return 2;
+                 case orginal:
+                return -1;
+            default:
+                break;
+        }
+        return 0;
+    }
+}
+ 
+       
 public class pdfDoc extends PDDocument {
 
 //    private static String hebREP(String subSequence) 
@@ -97,12 +117,21 @@ public class pdfDoc extends PDDocument {
 //    }
 
     boolean srinknopic = false;
-    PDDocument document = this;
+   private PDDocument document = new PDDocument();
 
     public boolean isSrinknopic() {
         return srinknopic;
     }
-
+    @Override
+    public PDPage getPage(int pageIndex)
+{
+    return document.getPage(pageIndex);
+}
+    @Override
+    public void addPage(PDPage page)
+    {
+         document.addPage(page);
+    }
     public void setSrinknopic(boolean srinknopic) {
         this.srinknopic = srinknopic;
     }
@@ -621,6 +650,27 @@ public class pdfDoc extends PDDocument {
         MakeADoc(shrinkpdfPIC, l, diagnosisListgetSelectedItem, g);
 
     }
+     public void loudDoc(File file, String getAbsolutePath, DividingPages g, JLabel l, boolean shrinkpdfPIC, ImageType diagnosisListgetSelectedItem) throws Exception {
+        // set the label to the path of the selected file
+
+        megsse("loading PDF.....................", l);
+        if (itispdf(getAbsolutePath)) {
+
+            lodepdf(file);
+            //  document.Chackboxtog(pages8, pages4);
+        } else {
+            lodepowerpoint(PDRectangle.A4, ImageType.RGB, getAbsolutePath);
+            // document.Chackboxtog(pages8, pages4);
+// document = powerpointtopdf(PDRectangle.A4, ImageType.RGB, j.getSelectedFile().getAbsolutePath());
+        }
+
+    //    MakeADoc(shrinkpdfPIC, l, diagnosisListgetSelectedItem, g);
+
+    }
+     public PDPageTree getPages() 
+     {
+      return document.getPages();
+    }
 
     public void MakeADoc(boolean shrinkpdfPIC, JLabel l, ImageType diagnosisListgetSelectedItem, DividingPages g) throws IOException {
         var doc = new PDDocument();
@@ -654,33 +704,7 @@ public class pdfDoc extends PDDocument {
         return absolutePath;
     }
 
-        public static   pdfDoc[] LodeAndMakeADocS(  File file, String absolutePath, DividingPages pagesneeds, JLabel l, boolean shrinkpdfnopicBool, ImageType imgetype, int splittype) throws IOException, Exception 
-        {
-        pdfDoc[] doc = new pdfDoc[splittype];
-        PDDocument document = Loader.loadPDF(file);
-        int howMuchleft = document.getNumberOfPages();
-        int TOgo = document.getNumberOfPages() / splittype;
-        int part = document.getNumberOfPages() / splittype;
-        int hdkdmot = 0;
-        for (int i = 0; i < splittype; i++) {
-            pdfDoc pdffoc = new pdfDoc();
-            pdffoc.addPage(new PDPage());
-         //   addingStraterPage(file.getName(), pdffoc, i);
-          pdfDoc.addPages(hdkdmot, TOgo, document, pdffoc);
-            hdkdmot = TOgo;
-            if (i+2==splittype) 
-            {
-                TOgo = document.getNumberOfPages();
-
-            } else {
-                TOgo = TOgo + part;
-            }
-            pdffoc.MakeADoc(shrinkpdfnopicBool, l, imgetype, pagesneeds);
-            doc[i] = pdffoc;
-
-        }
-        return doc;
-    }
+     
 
     public static void StraterPage( String name, pdfDoc pdffoc, int i) throws IOException {
         PDFont font = PDType0Font.load(pdffoc, new File("C:/windows/fonts/david.ttf"));
@@ -706,7 +730,7 @@ public class pdfDoc extends PDDocument {
 
     
 
-    private static void addPages(int hdkdmot, int TOgo, PDDocument documentMain,PDDocument docpdf) 
+    public static void addPages(int hdkdmot, int TOgo, PDDocument documentMain,PDDocument docpdf) 
     {
         for (int i = hdkdmot; i < TOgo; i++) 
         {
